@@ -86,8 +86,18 @@ chmod +x "${INSTALL_DIR}/ctx"
 
 echo "Installed ctx v${VERSION} to ${INSTALL_DIR}/ctx"
 
-# Check if install dir is in PATH
+# Ensure install dir is in PATH
 case ":$PATH:" in
   *":${INSTALL_DIR}:"*) ;;
-  *) echo "Note: add ${INSTALL_DIR} to your PATH" ;;
+  *)
+    SHELL_NAME="$(basename "$SHELL")"
+    case "$SHELL_NAME" in
+      zsh)  RC_FILE="$HOME/.zshrc" ;;
+      bash) RC_FILE="$HOME/.bashrc" ;;
+      *)    RC_FILE="$HOME/.profile" ;;
+    esac
+    echo "export PATH=\"${INSTALL_DIR}:\$PATH\"" >> "$RC_FILE"
+    echo "Added ${INSTALL_DIR} to PATH in ${RC_FILE}"
+    echo "Run 'source ${RC_FILE}' or open a new terminal to use ctx."
+    ;;
 esac
